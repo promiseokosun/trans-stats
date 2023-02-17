@@ -1,6 +1,8 @@
-package com.seerbit.transstats.dao;
+package com.seerbit.transstats.dao.impl;
 
+import com.seerbit.transstats.dao.TransactionDao;
 import com.seerbit.transstats.model.Transaction;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -8,26 +10,24 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
-public class TransactionDaoImpl implements TransactionDao{
+public class TransactionDaoImpl implements TransactionDao {
     private Map<String, Transaction> transactionMap = new HashMap<>();
+    private static int id = 1000;
 
     @Override
     public Transaction save(Transaction transaction) {
-        transactionMap.put(transaction.getId(), transaction);
-        return findById(transaction.getId());
+        String transactionId = Strings.isBlank(transaction.getId()) ? ++id + "" : transaction.getId();
+        transaction.setId(transactionId);
+        transactionMap.put(transactionId, transaction);
+        return findById(transactionId).get();
     }
 
     @Override
-    public Transaction update(String id, Transaction transaction) {
-        transactionMap.put(id, transaction);
-        return findById(transaction.getId());
-    }
-
-    @Override
-    public Transaction findById(String id) {
-        return transactionMap.get(id);
+    public Optional<Transaction> findById(String id) {
+        return Optional.ofNullable(transactionMap.get(id));
     }
 
     @Override
@@ -44,5 +44,10 @@ public class TransactionDaoImpl implements TransactionDao{
     public List<Transaction> findByTimestamp(LocalDateTime timestamp, int lastXseconds) {
         return transactionMap.values().stream()
                 .filter(transaction -> ChronoUnit.SECONDS.between(transaction.getTimestamp(), timestamp) <= lastXseconds).toList();
+    }
+
+    @Override
+    public void deleteAll() {
+        transactionMap = new HashMap<>();
     }
 }

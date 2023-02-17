@@ -4,17 +4,18 @@ import com.seerbit.transstats.model.Transaction;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionDao {
     Transaction save(Transaction transaction);
 
-    Transaction update(String id, Transaction transaction);
-
-    Transaction findById(String id);
+    Optional<Transaction> findById(String id);
 
     List<Transaction> findAll();
 
     void delete(String id);
 
     List<Transaction> findByTimestamp(LocalDateTime timestamp, int lastXseconds);
+
+    void deleteAll();
 }
