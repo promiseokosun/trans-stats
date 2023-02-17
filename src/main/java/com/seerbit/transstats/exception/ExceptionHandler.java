@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         });
 
         String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
-        ApiResponse apiResponse = new ApiResponse(ResponseCodes.BAD_INPUT_PARAM.getCode(), ResponseStatuses.failed.name(), ResponseCodes.BAD_INPUT_PARAM.getMessage(), errors, HttpStatus.BAD_REQUEST);
+        ApiResponse apiResponse = new ApiResponse(ResponseStatuses.failed.name(), ResponseCodes.BAD_INPUT_PARAM.getCode(), ResponseCodes.BAD_INPUT_PARAM.getMessage(), errors, HttpStatus.BAD_REQUEST);
         ResponseEntity re = new ResponseEntity<> (apiResponse, apiResponse.getHttpStatus());
         log.error(LOGGER_STRING_GET, url, re);
         return re;
@@ -48,7 +49,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleIOException(IOException ex, HttpServletRequest request) {
         log.error(LOGGER_STRING_GET,  request.getRequestURL() , ex.getMessage());
         ex.printStackTrace();
-        ApiResponse apiResponse = new ApiResponse(ResponseCodes.IO_EXCEPTION.getCode(), ResponseStatuses.error.name(),
+        ApiResponse apiResponse = new ApiResponse(ResponseStatuses.error.name(), ResponseCodes.IO_EXCEPTION.getCode(),
                 ResponseCodes.IO_EXCEPTION.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<> (apiResponse, apiResponse.getHttpStatus());
     }
@@ -57,15 +58,23 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleException(Exception ex, HttpServletRequest request) {
         log.error(LOGGER_STRING_GET,  request.getRequestURL() , ex.getMessage());
         ex.printStackTrace();
-        ApiResponse apiResponse = new ApiResponse(ResponseCodes.INTERNAL_SERVER.getCode(), ResponseStatuses.error.name(),
+        ApiResponse apiResponse = new ApiResponse(ResponseStatuses.error.name(), ResponseCodes.INTERNAL_SERVER.getCode(),
                 ResponseCodes.INTERNAL_SERVER.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<> (apiResponse, apiResponse.getHttpStatus());
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = DateTimeParseException.class)
+    public ResponseEntity<?> handleDateTimeParseException(DateTimeParseException ex, HttpServletRequest request) {
+        log.error(LOGGER_STRING_GET,  request.getRequestURL() , ex.getMessage());
+        ApiResponse apiResponse = new ApiResponse(ResponseStatuses.error.name(), ResponseCodes.INVALID_DATE_FORMAT.getCode(),
+                ResponseCodes.INVALID_DATE_FORMAT.getMessage(), null, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<> (apiResponse, apiResponse.getHttpStatus());
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = ApiException.class)
     public ResponseEntity<?> handleApiException(ApiException ex, HttpServletRequest request) {
         log.error(LOGGER_STRING_GET, request.getRequestURL(), ex.getMessage());
-        ApiResponse apiResponse = new ApiResponse(ex.getCode(), ex.getStatus(), ex.getMessage(), null, ex.getHttpStatus());
+        ApiResponse apiResponse = new ApiResponse(ex.getStatus(), ex.getCode(), ex.getMessage(), null, ex.getHttpStatus());
         return new ResponseEntity<> (apiResponse, ex.getHttpStatus());
     }
 

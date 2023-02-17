@@ -12,6 +12,7 @@ public enum ResponseCodes {
     RESOURCE_NOT_FOUND("05", "Resource not found."),
     RESOURCE_ALREADY_EXIST("06", "Resource already exist."),
     BAD_INPUT_PARAM("07", "Bad input params."),
+    INVALID_DATE_FORMAT("77","Invalid date format"),
     IO_EXCEPTION("88","I/O Error, Please try again"),
     INTERNAL_SERVER("99","Internal Server Error");
 
