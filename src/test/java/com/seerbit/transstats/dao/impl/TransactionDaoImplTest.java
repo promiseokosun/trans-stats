@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,19 +24,19 @@ class TransactionDaoImplTest {
 
     @BeforeEach
     public void setup() {
-        transaction1 = transactionDao.save(new Transaction(null, "30000", LocalDateTime.now()));
-        transaction2 = transactionDao.save(new Transaction(null, "35000", LocalDateTime.now()));
-        transaction3 = transactionDao.save(new Transaction(null, "40000", LocalDateTime.now()));
+        transaction1 = transactionDao.save(new Transaction(null, BigDecimal.valueOf(30000), LocalDateTime.now()));
+        transaction2 = transactionDao.save(new Transaction(null, BigDecimal.valueOf(35000), LocalDateTime.now()));
+        transaction3 = transactionDao.save(new Transaction(null, BigDecimal.valueOf(40000), LocalDateTime.now()));
     }
 
     @Test
     void save() {
-        assertNotNull(transactionDao.save(new Transaction(null, "20000", LocalDateTime.now())));
+        assertNotNull(transactionDao.save(new Transaction(null, BigDecimal.valueOf(20000), LocalDateTime.now())));
     }
 
     @Test
     void update() {
-        assertNotEquals(transactionDao.save(new Transaction(transaction2.getId(), "10000", LocalDateTime.now())).getAmount(), "30000");
+        assertNotEquals(transactionDao.save(new Transaction(transaction2.getId(), BigDecimal.valueOf(10000), LocalDateTime.now())).getAmount(), "30000");
     }
 
     @Test
